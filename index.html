@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temple Software: Strategic Engagement Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: This application merges a navigable, multi-section website structure with a data-driven infographic narrative. The tabbed navigation (Overview, Tier 1, Tier 2, Tier 3 & Strategy) provides a clear, user-controlled flow. The content within each tab is sourced from the infographic, guiding the user from the high-level market opportunity ("Why engage?") to specific, tiered action plans ("How to engage?"). This hybrid structure offers better usability than a long-scroll infographic while retaining its strong narrative and visual impact. -->
+    <!-- Visualization & Content Choices: Online Astrology Market Growth -> Goal: Inform -> Viz: Line Chart (Chart.js) -> Justification: A compelling hook to establish the Faith-Tech market's potential. | Event Categorization -> Goal: Organize -> Viz: HTML/CSS Diagram -> Justification: Clearly distinguishes B2C from B2B events, focusing the user's attention. NO SVG/Mermaid. | ITCX Attendee Profile -> Goal: Compare -> Viz: Donut Chart (Chart.js) -> Justification: A simple, effective visual for the high-value C-suite audience. | HSSF Regional Value -> Goal: Compare -> Viz: Bubble Chart (Chart.js) -> Justification: Visualizes the relative importance of regional fairs without relying on a problematic map. | Tiered Strategy Summary -> Goal: Organize -> Viz: HTML/CSS Flow Chart -> Justification: Provides a clear, actionable summary of the recommended strategy. NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 9999px;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #FF4E50;
+            color: white;
+        }
+        .flow-arrow {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+        }
+        .flow-arrow-down {
+            border-top: 10px solid #FC913A;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-20 border-b border-slate-200">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                 <h1 class="text-xl md:text-2xl font-bold text-slate-900">The Digital Dharma</h1>
+                <nav class="hidden md:flex items-center space-x-2">
+                    <a class="nav-link active" data-target="overview">Overview</a>
+                    <a class="nav-link" data-target="tier1">Tier 1: Prime Opportunity</a>
+                    <a class="nav-link" data-target="tier2">Tier 2: Regional Fairs</a>
+                    <a class="nav-link" data-target="tier3">Tier 3 & Strategy</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <section id="overview">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900">India's Faith-Tech Market: A Visual Guide</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">This dashboard provides a strategic overview for marketing temple technology in a rapidly emerging ecosystem. The following charts compare the key events and visualize the timeline for engagement.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-center mb-4">Event Strategic Focus Comparison</h3>
+                    <p class="text-center text-sm text-slate-500 mb-6">This chart compares the primary strategic value of each event type. ITCX is optimized for direct sales, while HSSF requires a brand-building approach, and WHC is purely for high-level networking.</p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="strategicFocusChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-center mb-4">Projected Event Timeline (2025-2026)</h3>
+                    <p class="text-center text-sm text-slate-500 mb-6">This timeline visualizes the key marketing opportunities over the next two years, allowing for effective long-range planning and resource allocation.</p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="overviewTimelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+             <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Focusing the Strategy: Where to Engage?</h2>
+                <p class="mt-2 text-slate-600 max-w-2xl mx-auto">A successful strategy requires surgically targeting the right type of event. Misidentifying the audience leads to wasted resources.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold text-red-800">🚫 Category A: B2C Devotional Gatherings</h3>
+                    <p class="mt-2 text-red-700">These are mass pilgrimages for the general public. While massive in scale, they are the wrong venue for B2B software marketing.</p>
+                    <ul class="mt-4 space-y-2 text-red-700">
+                        <li><span class="font-semibold">Example:</span> Kumbh Mela (400M+ attendees)</li>
+                        <li><span class="font-semibold">Audience:</span> Individual devotees, general public</li>
+                        <li><span class="font-semibold">Verdict:</span> Avoid for direct marketing.</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold text-green-800">✅ Category B: B2B Institutional Conventions</h3>
+                    <p class="mt-2 text-green-700">These are professional events specifically for temple leadership and management, creating a perfect B2B sales environment.</p>
+                     <ul class="mt-4 space-y-2 text-green-700">
+                        <li><span class="font-semibold">Example:</span> ITCX, HSSF</li>
+                        <li><span class="font-semibold">Audience:</span> Temple Trustees, CEOs, EOs</li>
+                        <li><span class="font-semibold">Verdict:</span> Prime target for exhibition.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="tier1" class="hidden">
+             <div class="text-center mb-12">
+                <span class="text-sm font-bold uppercase tracking-widest text-amber-500">Tier 1 Opportunity</span>
+                <h2 class="text-4xl font-extrabold mt-2 text-slate-900">International Temples Convention & Expo (ITCX)</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">The single most important event for direct B2B marketing. ITCX is a high-investment, high-return opportunity focused on technology and attended exclusively by temple leadership.</p>
+            </div>
+             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-12">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-slate-50 p-6 rounded-lg">
+                        <p class="text-5xl font-bold text-amber-500">1,500+</p>
+                        <p class="mt-2 text-slate-500">Expected Temples</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg">
+                        <p class="text-5xl font-bold text-amber-500">2,400+</p>
+                        <p class="mt-2 text-slate-500">C-Level Delegates</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg">
+                        <p class="text-5xl font-bold text-amber-500">58+</p>
+                        <p class="mt-2 text-slate-500">Countries Represented</p>
+                    </div>
+                </div>
+            </div>
+             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h3 class="text-xl font-bold text-center mb-4 text-slate-900">ITCX 2025: Direct Access to Decision-Makers</h3>
+                <p class="text-center text-sm text-slate-500 mb-6">The audience is curated for B2B success, composed entirely of senior leadership.</p>
+                <div class="chart-container h-64 md:h-80">
+                    <canvas id="itcxAudienceChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="tier2" class="hidden">
+            <div class="text-center mb-12">
+                <span class="text-sm font-bold uppercase tracking-widest text-orange-500">Tier 2 Opportunity</span>
+                <h2 class="text-4xl font-extrabold text-slate-900">Hindu Spiritual & Service Fairs (HSSF)</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">A series of regional fairs ideal for brand building. Success requires a strategic shift in messaging from "business efficiency" to "enabling service (seva)".</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-center mb-4">HSSF Regional Strategic Value</h3>
+                    <p class="text-center text-sm text-slate-500 mb-6">This chart visualizes the strategic importance of key HSSF locations. Bubble size corresponds to the strategic fit and market potential.</p>
+                    <div class="chart-container h-80">
+                        <canvas id="hssfBubbleChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                    <h3 class="text-xl font-bold text-center mb-4">The Strategic Messaging Pivot</h3>
+                    <p class="text-center text-sm text-slate-500 mb-6">At HSSF, your software is not a business tool, but a *dharma-enabling platform*. You must reframe technical features into the language of service.</p>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-100 rounded-lg">
+                            <p class="font-semibold text-slate-800">Feature: Donor Management</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div class="p-4 bg-red-50 rounded-lg">
+                                <p class="font-bold text-red-700">Standard Pitch (For ITCX)</p>
+                                <p class="mt-2 text-red-600">"Optimize donation workflows and increase revenue streams."</p>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg">
+                                <p class="font-bold text-green-700">Service Pitch (For HSSF)</p>
+                                <p class="mt-2 text-green-600">"A transparent tool to empower community contributions for charitable works."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tier3" class="hidden">
+            <div class="text-center mb-12">
+                <span class="text-sm font-bold uppercase tracking-widest text-indigo-500">Tier 3 & Strategy Summary</span>
+                <h2 class="text-4xl font-extrabold text-slate-900">The Complete Engagement Strategy</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">A multi-layered approach maximizes ROI by combining direct sales with strategic networking and intelligence gathering.</p>
+            </div>
+            <div class="space-y-8">
+                <div class="flex flex-col items-center">
+                    <div class="bg-white rounded-xl shadow-lg p-6 w-full md:w-3/4 text-center">
+                        <p class="text-sm font-bold text-amber-600">TIER 1: HIGH INVESTMENT</p>
+                        <h3 class="text-xl font-bold mt-1">Exhibit at ITCX</h3>
+                        <p class="text-sm text-slate-500 mt-2">Objective: Direct Lead Generation & Sales</p>
+                    </div>
+                    <div class="flow-arrow flow-arrow-down my-2"></div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 w-full md:w-3/4 text-center">
+                        <p class="text-sm font-bold text-orange-600">TIER 2: MEDIUM INVESTMENT</p>
+                        <h3 class="text-xl font-bold mt-1">Exhibit at Key HSSF Events</h3>
+                        <p class="text-sm text-slate-500 mt-2">Objective: Brand Building & Regional Leads</p>
+                    </div>
+                    <div class="flow-arrow flow-arrow-down my-2"></div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 w-full md:w-3/4 text-center">
+                        <p class="text-sm font-bold text-indigo-600">TIER 3: LOW INVESTMENT</p>
+                        <h3 class="text-xl font-bold mt-1">Attend WHC & Festivals</h3>
+                        <p class="text-sm text-slate-500 mt-2">Objective: Apex Networking & Market Intelligence</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sections = document.querySelectorAll('main > section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function showSection(targetId) {
+                sections.forEach(section => {
+                    section.classList.toggle('hidden', section.id !== targetId);
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.target === targetId);
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showSection(e.target.dataset.target);
+                });
+            });
+
+            const strategicFocusCtx = document.getElementById('strategicFocusChart');
+            if (strategicFocusCtx) {
+                new Chart(strategicFocusCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Direct Sales', 'Brand Building', 'Networking', 'Intel Gathering', 'Tech Focus'],
+                        datasets: [{
+                            label: 'ITCX',
+                            data: [5, 3, 4, 3, 5],
+                            backgroundColor: 'rgba(255, 78, 80, 0.2)',
+                            borderColor: 'rgba(255, 78, 80, 1)',
+                            pointBackgroundColor: 'rgba(255, 78, 80, 1)',
+                        }, {
+                            label: 'HSSF',
+                            data: [2, 5, 3, 2, 1],
+                            backgroundColor: 'rgba(252, 145, 58, 0.2)',
+                            borderColor: 'rgba(252, 145, 58, 1)',
+                            pointBackgroundColor: 'rgba(252, 145, 58, 1)',
+                        }, {
+                            label: 'WHC',
+                            data: [0, 2, 5, 4, 1],
+                            backgroundColor: 'rgba(249, 212, 35, 0.2)',
+                            borderColor: 'rgba(249, 212, 35, 1)',
+                            pointBackgroundColor: 'rgba(249, 212, 35, 1)',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 5,
+                                pointLabels: { font: { size: 12 } },
+                                grid: { color: '#e2e8f0' },
+                                angleLines: { color: '#e2e8f0' }
+                            }
+                        },
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) { label += ': '; }
+                                        label += context.raw;
+                                        return label + '/5';
+                                    },
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const overviewTimelineCtx = document.getElementById('overviewTimelineChart');
+            if(overviewTimelineCtx) {
+                new Chart(overviewTimelineCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ITCX 2025', 'HSSF Jaipur', 'HSSF Hyderabad', 'HSSF Mumbai', 'WHC 2026'],
+                        datasets: [{
+                            label: 'Event Schedule',
+                            data: [
+                                { x: [new Date('2025-02-17'), new Date('2025-02-19')], y: 'ITCX 2025'},
+                                { x: [new Date('2025-09-26'), new Date('2025-09-30')], y: 'HSSF Jaipur'},
+                                { x: [new Date('2025-11-07'), new Date('2025-11-10')], y: 'HSSF Hyderabad'},
+                                { x: [new Date('2026-01-09'), new Date('2026-01-12')], y: 'HSSF Mumbai'},
+                                { x: [new Date('2026-06-01'), new Date('2026-06-30')], y: 'WHC 2026'}
+                            ],
+                            backgroundColor: [
+                                '#FF4E50',
+                                '#FC913A',
+                                '#FC913A',
+                                '#FC913A',
+                                '#F9D423'
+                            ],
+                            borderRadius: 4,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                min: new Date('2025-01-01').valueOf(),
+                                max: new Date('2026-12-31').valueOf(),
+                                type: 'time',
+                                time: { unit: 'month' },
+                                grid: { display: false }
+                            },
+                            y: { grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const start = new Date(context.raw.x[0]).toLocaleDateString();
+                                        const end = new Date(context.raw.x[1]).toLocaleDateString();
+                                        return `Dates: ${start} to ${end}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const itcxAudienceCtx = document.getElementById('itcxAudienceChart');
+            if (itcxAudienceCtx) {
+                new Chart(itcxAudienceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Temple Trustees', 'CEOs & EOs', 'Senior Administrators', 'Other Management'],
+                        datasets: [{
+                            label: 'Delegate Profile',
+                            data: [40, 30, 25, 5],
+                            backgroundColor: ['#FF4E50', '#FC913A', '#F9D423', '#EDE574'],
+                            borderColor: '#ffffff',
+                            borderWidth: 4,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    boxWidth: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const hssfBubbleCtx = document.getElementById('hssfBubbleChart');
+            if (hssfBubbleCtx) {
+                new Chart(hssfBubbleCtx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: 'Mumbai',
+                            data: [{ x: 2, y: 4, r: 25 }],
+                            backgroundColor: '#FF4E50'
+                        }, {
+                            label: 'Jaipur',
+                            data: [{ x: 3, y: 2, r: 25 }],
+                             backgroundColor: '#FC913A'
+                        }, {
+                            label: 'Hyderabad',
+                            data: [{ x: 4, y: 5, r: 30 }],
+                             backgroundColor: '#F9D423'
+                        }, {
+                            label: 'Chennai',
+                            data: [{ x: 5, y: 3, r: 20 }],
+                             backgroundColor: '#EDE574'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom'
+                            },
+                             tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label;
+                                    },
+                                    title: function(tooltipItems) {
+                                        const item = tooltipItems[0];
+                                        let label = item.chart.data.labels[item.dataIndex];
+                                        if (Array.isArray(label)) {
+                                          return label.join(' ');
+                                        } else {
+                                          return label;
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false }
+                        }
+                    }
+                });
+            }
+
+            const countdownEl = document.getElementById('countdown');
+            if (countdownEl) {
+                const itcxEventDate = new Date('2025-02-17T00:00:00');
+                function updateCountdown() {
+                    const now = new Date();
+                    const diff = itcxEventDate - now;
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    countdownEl.textContent = days > 0 ? days : '0';
+                }
+                updateCountdown();
+                setInterval(updateCountdown, 1000 * 60 * 60);
+            }
+        });
+    </script>
+
+</body>
+</html>
